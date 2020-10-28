@@ -1,4 +1,3 @@
-"""
 import frappe
 from frappe import _   
 
@@ -66,4 +65,3 @@ def project_item(project, method):
     })
     project_item.flags.ignore_permission = True
     project_item.insert()
-"""

@@ -198,11 +198,11 @@ fixtures = [
 		"filters": [
 			[
 				"name", "in", [
-					"Sale Invoice Item-land_details",
-					"Sale Invoice Item-plot_id",
-					"Sale Invoice Item-column_break_7",
-					"Sale Invoice Item-land_project",
-					"Sale Invoice Item-subdivision",
+					"Sales Invoice Item-land_details",
+					"Sales Invoice Item-plot_id",
+					"Sales Invoice Item-column_break_7",
+					"Sales Invoice Item-land_project",
+					"Sales Invoice Item-subdivision",
 					"Customer-nrc_number",
 					"Project-map_section",
 					"Project-map",
