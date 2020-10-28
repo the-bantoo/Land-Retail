@@ -1,0 +1,18 @@
+include MANIFEST.in
+include requirements.txt
+include *.json
+include *.md
+include *.py
+include *.txt
+recursive-include land_retail *.css
+recursive-include land_retail *.csv
+recursive-include land_retail *.html
+recursive-include land_retail *.ico
+recursive-include land_retail *.js
+recursive-include land_retail *.json
+recursive-include land_retail *.md
+recursive-include land_retail *.png
+recursive-include land_retail *.py
+recursive-include land_retail *.svg
+recursive-include land_retail *.txt
+recursive-exclude land_retail *.pyc
