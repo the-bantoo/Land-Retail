@@ -160,7 +160,8 @@ fixtures = [
 		"filters": [
 			[
 				"name", "in", [
-					"Sales Invoice-Client"
+					"Sales Invoice-Client",
+					"Payment Entry-Client"
 				]
 			]
 		]
@@ -213,7 +214,8 @@ fixtures = [
 					"Project-ready_for_sale",
 					"Project-project_subdivision",
 					"Project-subdivision",
-					"Item-land"
+					"Item-land",
+					"Payment Entry Reference-plot"
 
 				]
 			]
