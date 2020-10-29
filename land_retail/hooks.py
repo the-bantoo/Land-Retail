@@ -91,12 +91,11 @@ doc_events = {
     },
 
     "Project":{
-        "after_insert": "land_retail.api.create_warehouse",
-        "after_save": "land_retail.api.project_item"
+        "after_save": "land_retail.api.create_project_item"
     },
 
     "payment Entry": {
-        "after_save": "land_retail.api.send_email"
+        "after_save": "land_retail.api.send_email" 	
     }
 }
 

@@ -51,7 +51,7 @@ def calculate_plot_details(plot, method):
 
 
 @frappe.whitelist()
-def project_item(project, method):
+def create_project_item(project, method):
     settings = frappe.get_doc('Land Settings')
     project_item = frappe.get_doc({
         "doctype": "Item",
