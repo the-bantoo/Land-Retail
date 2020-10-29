@@ -1,4 +1,4 @@
-[
+[[
  {
   "attach_print": 0,
   "channel": "Email",
@@ -33,7 +33,6 @@
     "parenttype": "Notification"
    }
   ],
-  "send_system_notification": 0,
   "sender": null,
   "sender_email": null,
   "set_property_after_alert": null,
@@ -75,7 +74,6 @@
     "parenttype": "Notification"
    }
   ],
-  "send_system_notification": 0,
   "sender": "National Housing Empowerment Fund",
   "sender_email": "erp@thebantoo.com",
   "set_property_after_alert": null,
@@ -117,7 +115,6 @@
     "parenttype": "Notification"
    }
   ],
-  "send_system_notification": 0,
   "sender": "Bantoo Dev",
   "sender_email": "erp@thebantoo.com",
   "set_property_after_alert": null,
@@ -125,4 +122,4 @@
   "subject": "Land Is Ready For Sale",
   "value_changed": null
  }
-]
+]]
