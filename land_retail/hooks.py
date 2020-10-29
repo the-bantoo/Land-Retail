@@ -165,18 +165,6 @@ fixtures = [
 				]
 			]
 		]
-
-	},
-	{
-		"dt": "Warehouse",
-        "filters": [
-            [
-                "warehouse_name", "in", [
-                    "Bulk Land",
-                    "Sales Land"
-                ]
-            ]
-        ]
 	},
 	{
 		"dt": "Project Type",
