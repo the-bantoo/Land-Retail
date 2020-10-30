@@ -3,7 +3,7 @@ from frappe import _
 
 @frappe.whitelist()
 def send_email(payment_entry):
-    payment_entry = frappe.get_doc('Payment Entry', payment_entry)
+    frappe.msgprint(_("Email function"))
     if payment_entry.paid_amount == 10000:
         frappe.sendmail(
             recipients="duncan@thebantoo.com",
@@ -40,6 +40,23 @@ def create_item(plot, method):
 
     plot.plot_item = "Plot " + str(plot.plot_id)
     plot.save()
+
+
+def add_plots_to_payment_entry(payment_entry, method):
+    frappe.msgprint("add_plots_to_payment_entry")
+    if payment_entry.payment_type == "Receive":
+        frappe.msgprint("recieve")
+        for ref in payment_entry.references:
+            if(ref.reference_doctype == "Sales Invoice"):
+                invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
+                frappe.msgprint("invoice")
+                for item in invoice.items:
+                    if item.plot_id:
+                        ref.plot = item.plot_id
+                        frappe.msgprint(ref.plot)
+                        
+
+
 
 
 @frappe.whitelist()

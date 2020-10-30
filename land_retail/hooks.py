@@ -95,7 +95,8 @@ doc_events = {
     },
 
     "payment Entry": {
-        "after_save": "land_retail.api.send_email" 	
+        "validate": "land_retail.api.add_plots_to_payment_entry",
+        "after_save": "land_retail.api.send_email"
     }
 }
 
