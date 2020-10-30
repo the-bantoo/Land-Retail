@@ -89,12 +89,10 @@ doc_events = {
         "after_insert": "land_retail.api.create_item",
         "validate": "land_retail.api.calculate_plot_details",
     },
-
-    "Project":{
+    "Project": {
         "after_save": "land_retail.api.create_project_item"
     },
-
-    "payment Entry": {
+    "Payment Entry": {
         "validate": "land_retail.api.add_plots_to_payment_entry",
         "after_save": "land_retail.api.send_email"
     }
