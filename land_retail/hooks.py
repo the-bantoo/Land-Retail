@@ -93,7 +93,7 @@ doc_events = {
         "after_save": "land_retail.api.create_project_item"
     },
     "Sales Invoice": {
-        "after_save": "land_retail.api.check_number_of_plots"
+        "validate": "land_retail.api.count_invoiced_plots"
     },
     "Payment Entry": {
         "validate": "land_retail.api.add_plots_to_payment_entry",

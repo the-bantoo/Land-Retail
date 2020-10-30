@@ -14,8 +14,14 @@ def send_email(payment_entry):
     else:
         frappe.msgprint(_("Paid Amount is not 10000"))
 
-def check_number_of_plots(invoice, method):
-    pass
+def count_invoiced_plots(invoice, method):
+    count = 1
+    for item in invoice.items:
+        if item.plot_id:
+            if count > 1:
+                frappe.throw("Only one plot is allowed per invoice")
+            count += 1
+
 
 @frappe.whitelist()
 def create_item(plot, method):
