@@ -89,15 +89,13 @@ doc_events = {
         "after_insert": "land_retail.api.create_item",
         "validate": "land_retail.api.calculate_plot_details",
     },
-    "Project": {
-        "after_save": "land_retail.api.create_project_item"
+
+    "Project":{
+        "after_save": "land_retail.api.project_item"
     },
-    "Sales Invoice": {
-        "validate": "land_retail.api.count_invoiced_plots"
-    },
+
     "Payment Entry": {
-        "validate": "land_retail.api.add_plots_to_payment_entry",
-        "after_save": "land_retail.api.send_email"
+		"on_submit": "land_retail.api.notification_email",
     }
 }
 
@@ -161,11 +159,22 @@ fixtures = [
 		"filters": [
 			[
 				"name", "in", [
-					"Sales Invoice-Client",
-					"Payment Entry-Client"
+					"Sales Invoice-Client"
 				]
 			]
 		]
+
+	},
+	{
+		"dt": "Warehouse",
+        "filters": [
+            [
+                "warehouse_name", "in", [
+                    "Bulk Land",
+                    "Sales Land"
+                ]
+            ]
+        ]
 	},
 	{
 		"dt": "Project Type",
@@ -203,8 +212,7 @@ fixtures = [
 					"Project-ready_for_sale",
 					"Project-project_subdivision",
 					"Project-subdivision",
-					"Item-land",
-					"Payment Entry Reference-plot"
+					"Item-land"
 
 				]
 			]

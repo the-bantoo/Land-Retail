@@ -1,8 +1,40 @@
 import frappe
-from frappe import _   
+from frappe import _
+
 
 @frappe.whitelist()
-def send_email(payment_entry):
+def notification_email(payment_entry, method):
+    if payment_entry.payment_type == "Receive":
+        for ref in payment_entry.references:
+            if(ref.reference_doctype == "Sales Invoice"):
+                invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
+                if ((invoice.total - invoice.outstanding_amount) >= (invoice.total * 0.2)) & ((invoice.total - invoice.outstanding_amount) < (invoice.total * 0.5)):
+                    frappe.sendmail(
+                        recipients="duncan@thebantoo.com",
+                        sender="erp@thebantoo.com",
+                        subject="20" + "%" + " Email Test",
+                        message="Running Email Test"
+                    )
+                    frappe.msgprint(_("Hello World!"))
+                elif ((invoice.total - invoice.outstanding_amount) >= (invoice.total * 0.5)) & ((invoice.total - invoice.outstanding_amount) < invoice.total):
+                    frappe.sendmail(
+                        recipients="duncan@thebantoo.com",
+                        sender="erp@thebantoo.com",
+                        subject="50" + "%" + " Email Test",
+                        message="Running Email Test"
+                    )
+                    frappe.msgprint(_("Hello Space!"))
+                elif (invoice.outstanding_amount == 0):
+                    frappe.sendmail(
+                        recipients="duncan@thebantoo.com",
+                        sender="erp@thebantoo.com",
+                        subject="100" + "%" + " Email Test",
+                        message="Running Email Test"
+                    )
+                    frappe.msgprint(_("Hello Universe!"))
+
+
+def send_email(payment_entry, method):
     if payment_entry.paid_amount == 10000:
         frappe.sendmail(
             recipients="duncan@thebantoo.com",
@@ -14,16 +46,7 @@ def send_email(payment_entry):
     else:
         frappe.msgprint(_("Paid Amount is not 10000"))
 
-def count_invoiced_plots(invoice, method):
-    count = 1
-    for item in invoice.items:
-        if item.plot_id:
-            if count > 1:
-                frappe.throw("Only one plot is allowed per invoice")
-            count += 1
 
-
-@frappe.whitelist()
 def create_item(plot, method):
     settings = frappe.get_doc('Land Settings')
     plot_item = frappe.get_doc({
@@ -49,26 +72,14 @@ def create_item(plot, method):
     plot.save()
 
 
-def add_plots_to_payment_entry(payment_entry, method):
-    if payment_entry.payment_type == "Receive":
-        for ref in payment_entry.references:
-            if(ref.reference_doctype == "Sales Invoice"):
-                invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
-                for item in invoice.items:
-                    if item.plot_id:
-                        ref.plot = item.plot_id                        
-
-
-@frappe.whitelist()
 def calculate_plot_details(plot, method):
     if not plot.area or int(plot.area) <= 0:
         plot.area = int(plot.width) * int(plot.length)
-        
+
     plot.dimensions = str(plot.width) + " x " + str(plot.length) + "m"
 
 
-@frappe.whitelist()
-def create_project_item(project, method):
+def project_item(project, method):
     settings = frappe.get_doc('Land Settings')
     project_item = frappe.get_doc({
         "doctype": "Item",
