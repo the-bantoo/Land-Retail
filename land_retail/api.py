@@ -33,20 +33,6 @@ def notification_email(payment_entry, method):
                     )
                     frappe.msgprint(_("Hello Universe!"))
 
-
-def send_email(payment_entry, method):
-    if payment_entry.paid_amount == 10000:
-        frappe.sendmail(
-            recipients="duncan@thebantoo.com",
-            sender="erp@thebantoo.com",
-            subject="Email Test",
-            message="Running Email Test"
-        )
-        frappe.msgprint(_("Email Sent"))
-    else:
-        frappe.msgprint(_("Paid Amount is not 10000"))
-
-
 def create_item(plot, method):
     settings = frappe.get_doc('Land Settings')
     plot_item = frappe.get_doc({
