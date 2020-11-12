@@ -89,13 +89,16 @@ doc_events = {
         "after_insert": "land_retail.api.create_item",
         "validate": "land_retail.api.calculate_plot_details",
     },
-
-    "Project":{
-        "after_save": "land_retail.api.project_item"
+    "Project": {
+        "after_save": "land_retail.api.create_project_item"
     },
-
+    "Sales Invoice": {
+        "validate": "land_retail.api.count_invoiced_plots"
+    },
     "Payment Entry": {
-		"on_submit": "land_retail.api.notification_email",
+        "validate": "land_retail.api.add_plots_to_payment_entry",
+        "after_save": "land_retail.api.send_email",
+        "on_submit": "land_retail.api.add_outstanding_amount_to_plot"
     }
 }
 
@@ -152,21 +155,20 @@ doc_events = {
 # auto_cancel_exempted_doctypes = ["Auto Repeat"]
 
 
-
 fixtures = [
-	{
-		"dt": "Custom Script",
-		"filters": [
-			[
-				"name", "in", [
-					"Sales Invoice-Client"
-				]
-			]
-		]
+    {
+        "dt": "Custom Script",
+        "filters": [
+            [
+                "name", "in", [
+                    "Sales Invoice-Client"
+                ]
+            ]
+        ]
 
-	},
-	{
-		"dt": "Warehouse",
+    },
+    {
+        "dt": "Warehouse",
         "filters": [
             [
                 "warehouse_name", "in", [
@@ -175,47 +177,48 @@ fixtures = [
                 ]
             ]
         ]
-	},
-	{
-		"dt": "Project Type",
+    },
+    {
+        "dt": "Project Type",
         "filters": [
             [
                 "project_type", "in", [
-                        "Land"
-                    ]
+                    "Land"
+                ]
             ]
         ]
-	},
-	{
-		"dt": "Notification",
+    },
+    {
+        "dt": "Notification",
         "filters": [
-            "is_standard != 1"
+            "is_standard != 1",
         ]
-	},
-	{
-		"dt": "Custom Field",
-		"filters": [
-			[
-				"name", "in", [
-					"Sales Invoice Item-land_details",
-					"Sales Invoice Item-plot_id",
-					"Sales Invoice Item-column_break_7",
-					"Sales Invoice Item-land_project",
-					"Sales Invoice Item-subdivision",
-					"Customer-nrc_number",
-					"Project-map_section",
-					"Project-map",
-					"Project-coordinates_section",
-					"Project-land_coordinates",
-					"Project-project_land_details",
-					"Project-area_sqm",
-					"Project-ready_for_sale",
-					"Project-project_subdivision",
-					"Project-subdivision",
-					"Item-land"
+    },
+    {
+        "dt": "Custom Field",
+        "filters": [
+            [
+                "name", "in", [
+                    "Sales Invoice Item-land_details",
+                    "Sales Invoice-payment_notification"
+                    "Sales Invoice Item-plot_id",
+                    "Sales Invoice Item-column_break_7",
+                    "Sales Invoice Item-land_project",
+                    "Sales Invoice Item-subdivision",
+                    "Customer-nrc_number",
+                    "Project-map_section",
+                    "Project-map",
+                    "Project-coordinates_section",
+                    "Project-land_coordinates",
+                    "Project-project_land_details",
+                    "Project-area_sqm",
+                    "Project-ready_for_sale",
+                    "Project-project_subdivision",
+                    "Project-subdivision",
+                    "Item-land"
 
-				]
-			]
-		]
-	}
+                ]
+            ]
+        ]
+    }
 ]
