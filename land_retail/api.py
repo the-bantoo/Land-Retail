@@ -119,6 +119,13 @@ def add_outstanding_amount_to_plot(payment_entry, method):
                         doc.sales_invoice = ref.reference_name
                         doc.paid_amount = invoice.total - invoice.outstanding_amount
                         doc.save()
+                    
+def reservation_fee(plot, method):
+    doc = frappe.get_doc("Land Settings")
+    plot.reservation_fee = doc.reservation_fee
+    plot.save()
+
+
 """"
 def set_status(plot):
 		if plot.paid_amount <= 1000:

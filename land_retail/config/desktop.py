@@ -9,6 +9,6 @@ def get_data():
 			"color": "grey",
 			"icon": "octicon octicon-file-directory",
 			"type": "module",
-			"label": _("Land Retail")
+			"label": _("Land Planning And Allocation")
 		}
 	]
