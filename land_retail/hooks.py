@@ -94,13 +94,14 @@ doc_events = {
         "after_save": "land_retail.api.create_project_item"
     },
     "Sales Invoice": {
-        "validate": "land_retail.api.count_invoiced_plots"
+        "validate": "land_retail.api.count_invoiced_plots",
+        "validate": "land_retail.api.plot_project",
     },
     "Payment Entry": {
         "validate": "land_retail.api.add_plots_to_payment_entry",
         "after_save": "land_retail.api.send_email",
         "on_submit": "land_retail.api.add_outstanding_amount_to_plot"
-    }
+    },
 }
 
 # doc_events = {

@@ -69,7 +69,8 @@ def create_item(plot, method):
     plot_item.flags.ignore_permission = True
     plot_item.insert()
 
-    plot.plot_no = "Plot " + plot.plot_id
+    plot.plot_id = "Plot " + plot.plot_id
+    plot.plot_id = "Plot " + plot.plot_id
     plot.save()
 
 
@@ -119,51 +120,24 @@ def add_outstanding_amount_to_plot(payment_entry, method):
                         doc.sales_invoice = ref.reference_name
                         doc.paid_amount = invoice.total - invoice.outstanding_amount
                         doc.save()
-                    
+
+
 def reservation_fee(plot, method):
     doc = frappe.get_doc("Land Settings")
     plot.reservation_fee = doc.reservation_fee
     plot.save()
 
 
-""""
-def set_status(plot):
-		if plot.paid_amount <= 1000:
-			plot.indicator_color = "orange"
-			plot.status = _("Reserved")
-		elif plot.paid_amount > 1000 & plot.paid_amount < plot.plot_price:
-			plot.indicator_color = "blue"
-			plot.status = _("Paid")
-		else:
-			plot.indicator_color = ("green")
-			plot.status = _("Available")
-            plot.save()
-
-
-@frappe.whitelist()
-def plot_status(payment_entry, method):
-    if payment_entry.payment_type == "Receive":
-        for ref in payment_entry.references:
-            if(ref.reference_doctype == "Sales Invoice"):
-                invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
-                if (invoice.items == "888"):
-
-
-def set_indicator(self):
-    		#Set indicator for portal
-		if self.outstanding_amount < 0:
-			self.indicator_title = _("Credit Note Issued")
-			self.indicator_color = "darkgrey"
-		elif self.outstanding_amount > 0 and getdate(self.due_date) >= getdate(nowdate()):
-			self.indicator_color = "orange"
-			self.indicator_title = _("Unpaid")
-		elif self.outstanding_amount > 0 and getdate(self.due_date) < getdate(nowdate()):
-			self.indicator_color = "red"
-			self.indicator_title = _("Overdue")
-		elif cint(self.is_return) == 1:
-			self.indicator_title = _("Return")
-			self.indicator_color = "darkgrey"
-		else:
-			self.indicator_color = "green"
-			self.indicator_title = _("Paid")
-"""
+def plot_project(sales_invoice, method):
+    for item in sales_invoice.items:
+        if item.item_name == "Construction":
+            if item.plot_id == True:
+                project = frappe.get_doc({
+                    "doctype": "Project",
+                    "project_name": "Construction on " + str(item.plot_id),
+                    "status": "Open",
+                    "estimated_costing": item.rate,
+                })
+                project.flags.ignore_permission = True
+                project.save()
+                frappe.msgprint(_("Done!"))
