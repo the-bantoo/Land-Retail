@@ -88,7 +88,6 @@ doc_events = {
     "Plot": {
         "after_insert": "land_retail.api.create_item",
         "validate": "land_retail.api.calculate_plot_details",
-        "after_save": "land_retail.api.reservation_fee",
     },
     "Project": {
         "after_save": "land_retail.api.create_project_item"
@@ -98,9 +97,13 @@ doc_events = {
         "validate": "land_retail.api.plot_project",
     },
     "Payment Entry": {
-        "validate": "land_retail.api.add_plots_to_payment_entry",
+        "on_submit": "land_retail.api.add_plots_to_payment_entry",
         "after_save": "land_retail.api.send_email",
-        "on_submit": "land_retail.api.add_outstanding_amount_to_plot"
+        "on_submit": "land_retail.api.add_outstanding_amount_to_plot",
+        "on_cancel": "land_retail.api.cancel_payment",
+    },
+    "Land Settings": {
+        "after_save": "land_retail.api.reservation_fee",
     },
 }
 

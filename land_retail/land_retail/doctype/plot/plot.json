@@ -1,5 +1,4 @@
 {
- "actions": [],
  "autoname": "field:plot_id",
  "creation": "2020-09-17 07:55:48.834193",
  "doctype": "DocType",
@@ -12,8 +11,8 @@
   "project",
   "column_break_3",
   "plot_type",
-  "plot_item",
   "status",
+  "plot_item",
   "section_break_7",
   "land_details",
   "area",
@@ -79,14 +78,6 @@
    "fieldtype": "Link",
    "label": "Plot Item",
    "options": "Item",
-   "read_only": 1
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Status",
-   "options": "Reserved\nCompleted\nAvailable\nUnder Construction\nPaid",
    "read_only": 1
   },
   {
@@ -194,10 +185,15 @@
    "fieldtype": "Data",
    "hidden": 1,
    "label": "Reservation Fee"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Reserved\nPaid\nCompleted\nAvailable"
   }
  ],
- "links": [],
- "modified": "2020-11-12 17:21:08.998982",
+ "modified": "2020-11-19 11:13:47.841059",
  "modified_by": "Administrator",
  "module": "Land Retail",
  "name": "Plot",

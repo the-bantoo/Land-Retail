@@ -44,8 +44,8 @@ def add_plots_to_payment_entry(payment_entry, method):
             if(ref.reference_doctype == "Sales Invoice"):
                 invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
                 for item in invoice.items:
-                    if item.plot_id:
-                        ref.plot = item.plot_id
+                    if item.item_code:
+                        ref.plot = item.item_code
 
 
 def create_item(plot, method):
@@ -57,8 +57,8 @@ def create_item(plot, method):
         "item_code": "Plot " + str(plot.plot_id),
         "land": 1,
         "is_stock_item": 1,
-        "stock_uom": "Nos",
-        "opening_stock": 1,
+        "stock_uom": "Square Meter",
+        "opening_stock": plot.area,
         "standard_rate": plot.plot_price,
         "is_purchase_item": 0,
         "is_sales_item": 1,
@@ -70,7 +70,7 @@ def create_item(plot, method):
     plot_item.insert()
 
     plot.plot_id = "Plot " + plot.plot_id
-    plot.plot_id = "Plot " + plot.plot_id
+    plot.valuation_rate = settings.valuation_rate
     plot.save()
 
 
@@ -112,8 +112,8 @@ def add_outstanding_amount_to_plot(payment_entry, method):
             if(ref.reference_doctype == "Sales Invoice"):
                 invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
                 for item in invoice.items:
-                    if item.plot_id:
-                        ref.plot = item.plot_id
+                    if item.item_code:
+                        ref.plot = item.item_code
                         doc = frappe.get_doc("Plot", ref.plot)
                         doc.outstanding_balance = invoice.outstanding_amount
                         doc.customer = invoice.customer_name
@@ -122,9 +122,9 @@ def add_outstanding_amount_to_plot(payment_entry, method):
                         doc.save()
 
 
-def reservation_fee(plot, method):
-    doc = frappe.get_doc("Land Settings")
-    plot.reservation_fee = doc.reservation_fee
+def reservation_fee(land_settings, method):
+    plot = frappe.get_doc("Plot")
+    plot.reservation_fee = land_settings.reservation_fee
     plot.save()
 
 
@@ -141,3 +141,42 @@ def plot_project(sales_invoice, method):
                 project.flags.ignore_permission = True
                 project.save()
                 frappe.msgprint(_("Done!"))
+
+
+def cancel_payment(payment_entry, method):
+    if payment_entry.payment_type == "Receive":
+        for ref in payment_entry.references:
+            if(ref.reference_doctype == "Sales Invoice"):
+                invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
+                for item in invoice.items:
+                    if item.item_code:
+                        ref.plot = item.item_code
+                        doc = frappe.get_doc("Plot", ref.plot)
+                        doc.outstanding_balance = doc.outstanding_balance + \
+                            payment_entry.total_allocated_amount
+                        doc.customer = invoice.customer_name
+                        doc.sales_invoice = ref.reference_name
+                        doc.paid_amount = doc.paid_amount - payment_entry.total_allocated_amount
+                        doc.save()
+                        if doc.paid_amount == 0:
+                            doc.customer = " "
+                            doc.sales_invoice = " "
+                            doc.outstanding_balance = 0
+                            doc.save()
+
+"""
+def plot_status(plot):
+    plot = frappe.get_doc("Plot")
+    if plot.paid_amount <= 1000:
+        plot.indicator_color = "orange"
+        plot.indicator_title = _("Reserved")
+    elif plot.paid_amount > 1000 & plot.paid_amount < plot.plot_price:
+        plot.indicator_color = "blue"
+        plot.indicator_title = _("Paid")
+    elif plot.paid_amount == plot.plot_price:
+        plot.indicator_color = ("darkgrey")
+        plot.indicator_title = _("Completed")
+    else:
+        plot.indicator_color = ("green")
+        plot.indicator_title = _("Available")
+"""
