@@ -94,7 +94,6 @@ doc_events = {
     },
     "Sales Invoice": {
         "validate": "land_retail.api.count_invoiced_plots",
-        "validate": "land_retail.api.plot_project",
     },
     "Payment Entry": {
         "on_submit": "land_retail.api.add_plots_to_payment_entry",

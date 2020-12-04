@@ -5,7 +5,7 @@ frappe.listview_settings['Plot'] = {
         if (plot.paid_amount <= plot.reservation_fee && plot.paid_amount > 0) {
             return [__("Reserved"), "orange"];
         } else if (plot.paid_amount > plot.reservation_fee && plot.paid_amount < plot.plot_price) {
-            return [__("Paid"), "blue"];
+            return [__("Paid"), "blue", plot.status == "Paid"];
         } else if (plot.paid_amount == plot.plot_price) {
             return [__("Completed"), "darkgrey"];
         } else if (plot.paid_amount == 0) {

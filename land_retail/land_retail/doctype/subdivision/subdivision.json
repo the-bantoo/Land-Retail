@@ -85,10 +85,11 @@
    "fieldname": "plots",
    "fieldtype": "Table",
    "label": "Plots",
-   "options": "Subdivision Plot"
+   "options": "Subdivision Plot",
+   "search_index": 1
   }
  ],
- "modified": "2020-10-28 11:58:41.287914",
+ "modified": "2020-11-24 09:49:45.117529",
  "modified_by": "Administrator",
  "module": "Land Retail",
  "name": "Subdivision",
