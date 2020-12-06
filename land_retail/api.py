@@ -90,9 +90,9 @@ def project_item(project, method):
     project_item.flags.ignore_permission = True
     project_item.insert()
 
-def count_invoiced_plots(invoice, method):
+def count_invoiced_plots(sales_invoice, method):
     count = 1
-    for item in invoice.items:
+    for item in sales_invoice.items:
         if item.plot_id:
             if count > 1:
                 frappe.throw("Only one plot is allowed per invoice")
@@ -104,9 +104,10 @@ def add_outstanding_amount_to_plot(payment_entry, method):
             if(ref.reference_doctype == "Sales Invoice"):
                 invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
                 for item in invoice.items:
-                    doc = frappe.get_doc("Plot", ref.plot)
-                    if item.item_code != ref.plot:
+                    settings = frappe.get_doc('Land Settings')
+                    if item.item_name == settings.construction_item:
                         continue
+                    doc = frappe.get_doc("Plot", item.item_name)
                     doc.outstanding_balance = invoice.outstanding_amount
                     doc.customer = invoice.customer_name
                     doc.sales_invoice = ref.reference_name
@@ -119,21 +120,19 @@ def reservation_fee(land_settings, method):
     plot.save()
 
 def cancel_payment(payment_entry, method):
+    settings = frappe.get_doc("Land Settings")
     if payment_entry.payment_type == "Receive":
         for ref in payment_entry.references:
             if(ref.reference_doctype == "Sales Invoice"):
-                sales_invoice = frappe.get_doc(
-                    "Sales Invoice", ref.reference_name)
+                sales_invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
                 for item in sales_invoice.items:
-                    doc = frappe.get_doc('Plot', ref.plot)
-                    if item.item_code != ref.plot:
+                    if item.item_name == settings.construction_item:
                         continue
-                    doc.balance = int(doc.outstanding_balance) + \
-                        payment_entry.total_allocated_amount
+                    doc = frappe.get_doc('Plot', item.item_name)
+                    doc.balance = int(doc.outstanding_balance) + payment_entry.total_allocated_amount
                     doc.customer_name = sales_invoice.customer_name
                     doc.sales_invoice = ref.reference_name
-                    doc.value = int(doc.paid_amount) - \
-                        payment_entry.total_allocated_amount
+                    doc.value = int(doc.paid_amount) - payment_entry.total_allocated_amount
                     doc.save()
                     if doc.paid_amount == 0:
                         doc.customer = ""
