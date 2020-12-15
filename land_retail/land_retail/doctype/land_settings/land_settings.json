@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "creation": "2020-10-05 19:04:53.141814",
  "doctype": "DocType",
  "editable_grid": 1,
@@ -11,7 +12,8 @@
   "draft_purchase_invoice",
   "column_break_6",
   "bulk_land_warehouse",
-  "sales_land_warehouse"
+  "sales_land_warehouse",
+  "reservation_fee"
  ],
  "fields": [
   {
@@ -59,10 +61,16 @@
    "fieldtype": "Link",
    "label": "Sales Land Warehouse",
    "options": "Warehouse"
+  },
+  {
+   "fieldname": "reservation_fee",
+   "fieldtype": "Currency",
+   "label": "Reservation Fee"
   }
  ],
  "issingle": 1,
- "modified": "2020-10-28 12:00:00.442433",
+ "links": [],
+ "modified": "2020-11-12 14:43:27.758041",
  "modified_by": "Administrator",
  "module": "Land Retail",
  "name": "Land Settings",

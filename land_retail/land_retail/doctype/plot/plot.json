@@ -11,8 +11,8 @@
   "project",
   "column_break_3",
   "plot_type",
-  "plot_item",
   "status",
+  "plot_item",
   "section_break_7",
   "land_details",
   "area",
@@ -26,11 +26,12 @@
   "coordinates_section",
   "coordinates",
   "customer_information",
-  "customer_name",
-  "customer_sales_invoice",
+  "customer",
+  "sales_invoice",
   "column_break_13",
-  "value",
-  "balance"
+  "paid_amount",
+  "outstanding_balance",
+  "reservation_fee"
  ],
  "fields": [
   {
@@ -77,14 +78,6 @@
    "fieldtype": "Link",
    "label": "Plot Item",
    "options": "Item",
-   "read_only": 1
-  },
-  {
-   "fieldname": "status",
-   "fieldtype": "Select",
-   "in_list_view": 1,
-   "label": "Status",
-   "options": "Available\nReserved\nUnder Construction\nCompleted",
    "read_only": 1
   },
   {
@@ -160,35 +153,47 @@
    "label": "Customer Information"
   },
   {
-   "fieldname": "customer_name",
-   "fieldtype": "Link",
-   "label": "Customer Name",
-   "options": "Customer",
-   "read_only": 1
-  },
-  {
-   "fieldname": "customer_sales_invoice",
-   "fieldtype": "Link",
-   "label": "Customer Sales Invoice",
-   "options": "Sales Invoice",
-   "read_only": 1
-  },
-  {
    "fieldname": "column_break_13",
    "fieldtype": "Column Break"
   },
   {
-   "fieldname": "value",
-   "fieldtype": "Read Only",
-   "label": "Value "
+   "fieldname": "outstanding_balance",
+   "fieldtype": "Currency",
+   "label": "Outstanding Balance",
+   "read_only": 1
   },
   {
-   "fieldname": "balance",
-   "fieldtype": "Read Only",
-   "label": "Balance"
+   "fieldname": "customer",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "read_only": 1
+  },
+  {
+   "fieldname": "sales_invoice",
+   "fieldtype": "Data",
+   "label": "Customer Sales Invoice",
+   "read_only": 1
+  },
+  {
+   "fieldname": "paid_amount",
+   "fieldtype": "Currency",
+   "label": "Paid Amount",
+   "read_only": 1
+  },
+  {
+   "fieldname": "reservation_fee",
+   "fieldtype": "Data",
+   "hidden": 1,
+   "label": "Reservation Fee"
+  },
+  {
+   "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Reserved\nPaid\nCompleted\nAvailable"
   }
  ],
- "modified": "2020-10-28 11:59:43.558033",
+ "modified": "2020-11-23 13:02:49.807516",
  "modified_by": "Administrator",
  "module": "Land Retail",
  "name": "Plot",

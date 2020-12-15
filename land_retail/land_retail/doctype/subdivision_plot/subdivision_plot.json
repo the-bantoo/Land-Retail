@@ -28,14 +28,13 @@
   },
   {
    "fieldname": "status",
-   "fieldtype": "Select",
+   "fieldtype": "Data",
    "in_list_view": 1,
-   "label": "Status",
-   "options": "Available\nReserved\nUnder Construction\nCompleted"
+   "label": "Status"
   }
  ],
  "istable": 1,
- "modified": "2020-10-28 12:00:48.827034",
+ "modified": "2020-11-24 09:51:16.704899",
  "modified_by": "Administrator",
  "module": "Land Retail",
  "name": "Subdivision Plot",
