@@ -55,7 +55,7 @@ def create_item(plot, method):
         "doctype": "Item",
         "item_group": settings.land_for_sale_group,
         "default_warehouse": settings.sales_land_warehouse,
-        "item_code": plot.plot_id,
+        "item_code": "Plot " + str(plot.plot_id),
         "land": 1,
         "is_stock_item": 1,
         "stock_uom": "Square Meter",
@@ -219,8 +219,6 @@ def plot_coordinates(name):
     plot = frappe.get_all('Plot', filters={'plot_id': name}, fields=['plot_id', 'plot_no', 'subdivision', 'project', 'area', 'length', 'width', 
     'status', 'plot_price', 'map', 'customer_name', 'plot_project', 'value', 'balance', 'reservation_fee', 'dimensions'])
     plot_info = plot + coordinates
-    
-    return plot_info
 
 @frappe.whitelist()
 def sub_coordinates(name):
@@ -239,26 +237,4 @@ def sub_coordinates(name):
     #subdivisions = frappe.get_doc(doctype, name)
     
     return subdivision_plot_info
-
-#return all subdivisions under current projects
-@frappe.whitelist()
-def return_subdivisions(project_name):
-    all_subdivisions = frappe.get_all('Subdivision', filters={'project': project_name}, fields=['title'])
-    
-    project_subdivisions = []
-    for all_subdivision_details in all_subdivisions:
-        subdiv =  frappe.get_doc('Subdivision', all_subdivision_details.title)
-        project_subdivisions.append(subdiv);
-    return project_subdivisions
-    #frappe.msgprint(all_subdivisions)
-    #return "Hey"
-    
-@frappe.whitelist()
-def return_subdivision_plots(subdivision_name):
-    all_subdivision_plots = frappe.get_all('Plot', filters={'subdivision': subdivision_name}, fields=['plot_id'])
-    
-    subdivision_plots = []
-    for subdivision_plot in all_subdivision_plots:
-        subdiv_plot = frappe.get_doc('Plot', subdivision_plot.plot_id)
-        subdivision_plots.append(subdiv_plot)
-    return subdivision_plots
+ 

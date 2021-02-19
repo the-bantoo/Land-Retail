@@ -55,7 +55,7 @@ def create_item(plot, method):
         "doctype": "Item",
         "item_group": settings.land_for_sale_group,
         "default_warehouse": settings.sales_land_warehouse,
-        "item_code": plot.plot_id,
+        "item_code": "Plot " + str(plot.plot_id),
         "land": 1,
         "is_stock_item": 1,
         "stock_uom": "Square Meter",
@@ -67,6 +67,7 @@ def create_item(plot, method):
         "description": "Project: " + str(plot.project) + "<br>" + "Subdivision: " + str(plot.subdivision) + "<br>" + "Plot ID: " + str(plot.plot_id) + "<br>" + "Dimensions: " + str(plot.dimensions) + "<br>" + "Area: " + str(plot.area) + "sqm",
     })
     plot_item.flags.ignore_permission = True
+    plot.plot_id = "Plot " + plot.plot_id
     plot.plot_no = plot.plot_id
     plot_item.insert()
     plot.save()
@@ -213,52 +214,11 @@ def get_new_subdivisions(name = None):
             frappe.msgprint("Done!")
             
 @frappe.whitelist()
-def plot_coordinates(name):
-    coordinates = frappe.get_all('Coordinates', filters={'plots': name}, fields=['latitude', 'longitude'])
+def get_coordinates(name):
+    paid_plots = frappe.get_all('Plot', name, filters={'status': 'Paid'}, fields=['plot_id', 'plot_no', 'subdivision', 'project', 'area', 'length', 'width', 'status', 'plot_price', 'map', 'coordinates', 'customer_name', 'plot_project', 'value', 'balance', 'reservation_fee'])
+    retu
     
-    plot = frappe.get_all('Plot', filters={'plot_id': name}, fields=['plot_id', 'plot_no', 'subdivision', 'project', 'area', 'length', 'width', 
-    'status', 'plot_price', 'map', 'customer_name', 'plot_project', 'value', 'balance', 'reservation_fee', 'dimensions'])
-    plot_info = plot + coordinates
     
-    return plot_info
-
-@frappe.whitelist()
-def sub_coordinates(name):
-    subdivision = frappe.get_doc('Subdivision', name)
-    plots = subdivision.plots
-    subdivision_plot_info = []
-    for plot in plots:
-        plot_index = frappe.get_doc('Plot', plot.plot_id)
-        subdivision_plot_info.append(plot_index)
-    #for plot in subdivision.plots:
-    #    coordinates = frappe.get_all('Coordinates', filters={'plots': plot}, fields=['latitude', 'longitude', 'plots'])
-    #    frappe.msgprint(coordinates)
-    #frappe.msgprint(subdivision.title)
-    #return subdivision.title
-    #return frappe.db.count('Subdivision')
-    #subdivisions = frappe.get_doc(doctype, name)
-    
-    return subdivision_plot_info
-
-#return all subdivisions under current projects
-@frappe.whitelist()
-def return_subdivisions(project_name):
-    all_subdivisions = frappe.get_all('Subdivision', filters={'project': project_name}, fields=['title'])
-    
-    project_subdivisions = []
-    for all_subdivision_details in all_subdivisions:
-        subdiv =  frappe.get_doc('Subdivision', all_subdivision_details.title)
-        project_subdivisions.append(subdiv);
-    return project_subdivisions
-    #frappe.msgprint(all_subdivisions)
-    #return "Hey"
-    
-@frappe.whitelist()
-def return_subdivision_plots(subdivision_name):
-    all_subdivision_plots = frappe.get_all('Plot', filters={'subdivision': subdivision_name}, fields=['plot_id'])
-    
-    subdivision_plots = []
-    for subdivision_plot in all_subdivision_plots:
-        subdiv_plot = frappe.get_doc('Plot', subdivision_plot.plot_id)
-        subdivision_plots.append(subdiv_plot)
-    return subdivision_plots
+    #reserved_plots = frappe.get_all('Plot', name,filters={'status': 'Reserved'}, fields=['plot_id', 'plot_no', 'subdivision', 'project', 'area', 'length', 'width', 'status', 'plot_price', 'map', 'coordinates', 'customer_name', 'plot_project', 'value', 'balance', 'reservation_fee'])
+    #completed_plots = frappe.get_all('Plot', ,filters={'status': 'Completed'}, fields=['plot_id', 'plot_no', 'subdivision', 'project', 'area', 'length', 'width', 'status', 'plot_price', 'map', 'coordinates', 'customer_name', 'plot_project', 'value', 'balance', 'reservation_fee'])
+    #available_plots = frappe.get_all('Plot', name,filters={'status': 'Available'}, fields=['plot_id', 'plot_no', 'subdivision', 'project', 'area', 'length', 'width', 'status', 'plot_price', 'map', 'coordinates', 'customer_name', 'plot_project', 'value', 'balance', 'reservation_fee'])
