@@ -38,7 +38,6 @@ def notification_email(payment_entry, method):
                     invoice.payment_notification = 'Paid In Full'
                     frappe.msgprint(_("Hello Universe!"))
 
-
 def add_plots_to_payment_entry(payment_entry, method):
     if payment_entry.payment_type == "Receive":
         for ref in payment_entry.references:
@@ -47,7 +46,6 @@ def add_plots_to_payment_entry(payment_entry, method):
                 for item in invoice.items:
                     if item.item_code:
                         ref.plot = item.item_code
-
 
 def create_item(plot, method):
     settings = frappe.get_doc('Land Settings')
@@ -68,16 +66,15 @@ def create_item(plot, method):
     })
     plot_item.flags.ignore_permission = True
     plot.plot_no = plot.plot_id
+    plot.reservation_fee = settings.reservation_fee
     plot_item.insert()
     plot.save()
 
-
-def calculate_plot_details(plot, method):
+def calculate_area(plot, method):
     if not plot.area or int(plot.area) <= 0:
         plot.area = int(plot.width) * int(plot.length)
 
     plot.dimensions = str(plot.width) + " x " + str(plot.length) + "m"
-
 
 def project_item(project, method):
     settings = frappe.get_doc('Land Settings')
@@ -94,7 +91,6 @@ def project_item(project, method):
     project_item.flags.ignore_permission = True
     project_item.insert()
 
-
 def count_invoiced_plots(invoice, method):
     count = 1
     for item in invoice.items:
@@ -102,7 +98,6 @@ def count_invoiced_plots(invoice, method):
             if count > 1:
                 frappe.throw("Only one plot is allowed per invoice")
             count += 1
-
 
 def add_outstanding_amount_to_plot(payment_entry, method):
     if payment_entry.payment_type == "Receive":
@@ -114,18 +109,11 @@ def add_outstanding_amount_to_plot(payment_entry, method):
                     if item.item_name == settings.construction_item:
                         continue
                     doc = frappe.get_doc("Plot", item.item_name)
-                    doc.balance = invoice.outstanding_amount
-                    doc.customer_name = invoice.customer_name
-                    doc.customer_sales_invoice = ref.reference_name
-                    doc.value = invoice.total - invoice.outstanding_amount
+                    doc.outstanding_balance = invoice.outstanding_amount
+                    doc.customer = invoice.customer_name
+                    doc.sales_invoice = ref.reference_name
+                    doc.paid_amount = invoice.total - invoice.outstanding_amount
                     doc.save()
-
-
-def reservation_fee(land_settings, method):
-    plot = frappe.get_doc("Plot")
-    plot.reservation_fee = land_settings.reservation_fee
-    plot.save()
-
 
 def cancel_payment(payment_entry, method):
     settings = frappe.get_doc('Land Settings')
@@ -138,19 +126,18 @@ def cancel_payment(payment_entry, method):
                     if item.item_name == settings.construction_item:
                         continue
                     doc = frappe.get_doc("Plot", item.item_name)
-                    doc.balance = int(doc.balance) + \
-                        payment_entry.total_allocated_amount
-                    doc.customer_name = sales_invoice.customer_name
-                    doc.customer_sales_invoice = ref.reference_name
-                    doc.value = int(doc.value) - \
+                    doc.outstanding_balance = str(doc.balance) + \
+                        str(payment_entry.total_allocated_amount)
+                    doc.customer = sales_invoice.customer_name
+                    doc.sales_invoice = ref.reference_name
+                    doc.paid_amount = doc.paid_amount - \
                         payment_entry.total_allocated_amount
                     doc.save()
-                    if doc.value == 0:
-                        doc.customer_name = ""
-                        doc.customer_sales_invoice = ""
-                        doc.balance = 0
+                    if doc.paid_amount == 0:
+                        doc.customer = ""
+                        doc.sales_invoice = ""
+                        doc.outstanding_balance = 0
                         doc.save()
-
 
 def plot_project(sales_invoice, method):
     count = 1
@@ -240,7 +227,6 @@ def sub_coordinates(name):
     
     return subdivision_plot_info
 
-#return all subdivisions under current projects
 @frappe.whitelist()
 def return_subdivisions(project_name):
     all_subdivisions = frappe.get_all('Subdivision', filters={'project': project_name}, fields=['title'])

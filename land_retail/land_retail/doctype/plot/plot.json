@@ -1,4 +1,5 @@
 {
+ "actions": [],
  "autoname": "field:plot_id",
  "creation": "2020-09-17 07:55:48.834193",
  "doctype": "DocType",
@@ -182,22 +183,21 @@
   },
   {
    "fieldname": "reservation_fee",
-   "fieldtype": "Data",
-   "hidden": 1,
+   "fieldtype": "Currency",
    "label": "Reservation Fee"
   },
   {
    "fieldname": "status",
-   "fieldtype": "Select",
-   "label": "Status",
-   "options": "Reserved\nPaid\nCompleted\nAvailable"
+   "fieldtype": "Data",
+   "label": "Status"
   }
  ],
- "modified": "2020-11-23 13:02:49.807516",
+ "links": [],
+ "modified": "2021-02-26 17:02:39.062285",
  "modified_by": "Administrator",
  "module": "Land Retail",
  "name": "Plot",
- "owner": "duncan@thebantoo.com",
+ "owner": "Administrator",
  "permissions": [
   {
    "create": 1,
