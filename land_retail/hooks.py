@@ -97,6 +97,7 @@ doc_events = {
         "validate": "land_retail.api.add_plot",
         "on_submit": "land_retail.api.payment_update",
         "on_cancel": "land_retail.api.cancel_payment",
+        "validate": "land_retail.api.plot_project"
     },
 }
 

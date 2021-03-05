@@ -95,3 +95,23 @@ def count_invoiced_plots(invoice, method):
             if count > 1:
                 frappe.throw("Only one plot is allowed per invoice")
             count += 1
+
+
+def plot_project(payment_entry, method):
+    if payment_entry.payment_type == "Receive":
+        for ref in payment_entry.references:
+            if(ref.reference_doctype == "Sales Invoice"):
+                invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
+                for item in invoice.items:
+                    settings = frappe.get_doc('Land Settings')
+                    if item.item_name == settings.construction_item and payment_entry.total_allocated_amount == 0.5 * invoice.total:
+                        continue
+                    plot = frappe.get_doc("Plot", item.item_name)
+                    plot_project = frappe.get_doc({
+                        "doctype": "Project",
+                        "project_name": "Plot " + str(plot.plot_id),
+                        "status": "Open",
+
+                    })
+                    plot_project.flags.ignore_permission = True
+                    plot_project.insert()
