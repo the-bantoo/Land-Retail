@@ -87,22 +87,16 @@ app_license = "MIT"
 doc_events = {
     "Plot": {
         "after_insert": "land_retail.api.create_item",
-        "validate": "land_retail.api.calculate_plot_details",
-    },
-    "Project": {
-        "after_save": "land_retail.api.create_project_item"
+        "validate": "land_retail.api.calculate_area",
     },
     "Sales Invoice": {
-        "validate": "land_retail.api.count_invoiced_plots",
+        "validate": "land_retail.api.plot_details",
+        "on_submit": "land_retail.api.count_invoiced_plots",
     },
     "Payment Entry": {
-        "on_submit": "land_retail.api.add_plots_to_payment_entry",
-        "after_save": "land_retail.api.send_email",
-        "on_submit": "land_retail.api.add_outstanding_amount_to_plot",
+        "validate": "land_retail.api.add_plot",
+        "on_submit": "land_retail.api.payment_update",
         "on_cancel": "land_retail.api.cancel_payment",
-    },
-    "Land Settings": {
-        "after_save": "land_retail.api.reservation_fee",
     },
 }
 
@@ -203,12 +197,12 @@ fixtures = [
         "filters": [
             [
                 "name", "in", [
-                    "Sales Invoice Item-land_details",
+                    "Sales Invoice Item-plot_details",
                     "Sales Invoice-payment_notification"
                     "Sales Invoice Item-plot_id",
-                    "Sales Invoice Item-column_break_7",
-                    "Sales Invoice Item-land_project",
-                    "Sales Invoice Item-subdivision",
+                    "Sales Invoice Item-column_break_12",
+                    "Sales Invoice Item-plot_project",
+                    "Sales Invoice Item-plot_subdivision",
                     "Customer-nrc_number",
                     "Project-map_section",
                     "Project-map",

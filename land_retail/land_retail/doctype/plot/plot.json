@@ -26,7 +26,7 @@
   "coordinates_section",
   "coordinates",
   "customer_information",
-  "customer",
+  "customer_name",
   "sales_invoice",
   "column_break_13",
   "paid_amount",
@@ -163,12 +163,6 @@
    "read_only": 1
   },
   {
-   "fieldname": "customer",
-   "fieldtype": "Data",
-   "label": "Customer Name",
-   "read_only": 1
-  },
-  {
    "fieldname": "sales_invoice",
    "fieldtype": "Data",
    "label": "Customer Sales Invoice",
@@ -190,10 +184,17 @@
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
-   "options": "Reserved\nPaid\nCompleted\nAvailable"
+   "options": "Reserved\nPaid\nCompleted\nAvailable",
+   "read_only": 1
+  },
+  {
+   "fieldname": "customer_name",
+   "fieldtype": "Data",
+   "label": "Customer Name",
+   "read_only": 1
   }
  ],
- "modified": "2020-11-23 13:02:49.807516",
+ "modified": "2021-03-04 13:27:49.806871",
  "modified_by": "Administrator",
  "module": "Land Retail",
  "name": "Plot",
