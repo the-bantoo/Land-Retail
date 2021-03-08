@@ -40,12 +40,12 @@ def payment_update(payment_entry, method):
                     settings = frappe.get_doc('Land Settings')
                     if item.item_name == settings.construction_item:
                         continue
-                    doc = frappe.get_doc("Plot", item.item_name)
-                    doc.outstanding_balance = invoice.outstanding_amount
-                    doc.customer_name = invoice.customer_name
-                    doc.sales_invoice = ref.reference_name
-                    doc.paid_amount = payment_entry.total_allocated_amount
-                    doc.save()
+                    plot = frappe.get_doc("Plot", item.item_name)
+                    plot.outstanding_balance = invoice.outstanding_amount
+                    plot.customer_name = invoice.customer_name
+                    plot.sales_invoice = ref.reference_name
+                    plot.paid_amount = payment_entry.total_allocated_amount
+                    plot.save()
 
 def cancel_payment(payment_entry, method):
     settings = frappe.get_doc("Land Settings")
@@ -56,17 +56,17 @@ def cancel_payment(payment_entry, method):
                 for item in sales_invoice.items:
                     if item.item_name == settings.construction_item:
                         continue
-                    doc = frappe.get_doc('Plot', item.item_name)
-                    doc.outstanding_balance = int(doc.outstanding_balance) + payment_entry.total_allocated_amount
-                    doc.customer_name = sales_invoice.customer_name
-                    doc.sales_invoice = ref.reference_name
-                    doc.paid_amount = int(doc.paid_amount) - payment_entry.total_allocated_amount
-                    doc.save()
-                    if doc.paid_amount == 0:
-                        doc.customer_name = ""
-                        doc.sales_invoice = ""
-                        doc.outstanding_balance = 0
-                        doc.save()
+                    plot = frappe.get_doc('Plot', item.item_name)
+                    plot.outstanding_balance = int(plot.outstanding_balance) + payment_entry.total_allocated_amount
+                    plot.customer_name = sales_invoice.customer_name
+                    plot.sales_invoice = ref.reference_name
+                    plot.paid_amount = int(plot.paid_amount) - payment_entry.total_allocated_amount
+                    plot.save()
+                    if plot.paid_amount == 0:
+                        plot.customer_name = ""
+                        plot.sales_invoice = ""
+                        plot.outstanding_balance = 0
+                        plot.save()
                         
 def add_plot(payment_entry, method):
     if payment_entry.payment_type == "Receive":
@@ -104,14 +104,17 @@ def plot_project(payment_entry, method):
                 invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
                 for item in invoice.items:
                     settings = frappe.get_doc('Land Settings')
-                    if item.item_name == settings.construction_item and payment_entry.total_allocated_amount == 0.5 * invoice.total:
+                    if item.item_name == settings.construction_item:
                         continue
-                    plot = frappe.get_doc("Plot", item.item_name)
-                    plot_project = frappe.get_doc({
-                        "doctype": "Project",
-                        "project_name": "Plot " + str(plot.plot_id),
-                        "status": "Open",
+                    plotproject = "Plot " + str(item.plot_id)
+                    project = frappe.get_doc("Project",plotproject)
+                    if plotproject != project.project_name and invoice.outstanding_amount >= 0.5 * invoice.total:
+                        plot = frappe.get_doc("Plot", item.plot_id)
+                        plot_project = frappe.get_doc({
+                            "doctype": "Project",
+                            "project_name": "Plot " + str(plot.plot_id),
+                            "status": "Open",
 
-                    })
-                    plot_project.flags.ignore_permission = True
-                    plot_project.insert()
+                        })
+                        plot_project.flags.ignore_permission = True
+                        plot_project.insert()
