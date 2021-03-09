@@ -178,8 +178,7 @@
   {
    "fieldname": "paid_amount",
    "fieldtype": "Currency",
-   "label": "Paid Amount",
-   "read_only": 1
+   "label": "Paid Amount"
   },
   {
    "fieldname": "reservation_fee",
@@ -193,7 +192,7 @@
   }
  ],
  "links": [],
- "modified": "2021-02-26 17:02:39.062285",
+ "modified": "2021-03-01 10:33:22.829085",
  "modified_by": "Administrator",
  "module": "Land Retail",
  "name": "Plot",

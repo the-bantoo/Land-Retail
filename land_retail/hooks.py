@@ -98,7 +98,8 @@ doc_events = {
     "Payment Entry": {
         "on_submit": "land_retail.api.add_plots_to_payment_entry",
         "after_save": "land_retail.api.send_email",
-        "on_submit": "land_retail.api.add_outstanding_amount_to_plot",
+        "on_submit": "land_retail.api.construction_Payment",
+        "on_submit": "land_retail.api.payment_update",
         "on_cancel": "land_retail.api.cancel_payment",
     },
 }

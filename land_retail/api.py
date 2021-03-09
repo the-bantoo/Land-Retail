@@ -2,7 +2,6 @@ import frappe
 import json
 from frappe import _
 
-
 @frappe.whitelist()
 def notification_email(payment_entry, method):
     if payment_entry.payment_type == "Receive":
@@ -47,7 +46,7 @@ def add_plots_to_payment_entry(payment_entry, method):
                     if item.item_code:
                         ref.plot = item.item_code
 
-def create_item(plot, method):
+def plot_item(plot, method):
     settings = frappe.get_doc('Land Settings')
     plot_item = frappe.get_doc({
         "doctype": "Item",
@@ -72,7 +71,7 @@ def create_item(plot, method):
 
 def calculate_area(plot, method):
     if not plot.area or int(plot.area) <= 0:
-        plot.area = int(plot.width) * int(plot.length)
+        plot.area = int(input(plot.width * plot.length))
 
     plot.dimensions = str(plot.width) + " x " + str(plot.length) + "m"
 
@@ -99,7 +98,7 @@ def count_invoiced_plots(invoice, method):
                 frappe.throw("Only one plot is allowed per invoice")
             count += 1
 
-def add_outstanding_amount_to_plot(payment_entry, method):
+def construction_Payment(payment_entry, method):
     if payment_entry.payment_type == "Receive":
         for ref in payment_entry.references:
             if(ref.reference_doctype == "Sales Invoice"):
@@ -108,6 +107,19 @@ def add_outstanding_amount_to_plot(payment_entry, method):
                     settings = frappe.get_doc('Land Settings')
                     if item.item_name == settings.construction_item:
                         continue
+                    doc = frappe.get_doc("Plot", item.item_name)
+                    doc.outstanding_balance = invoice.outstanding_amount
+                    doc.customer = invoice.customer_name
+                    doc.sales_invoice = ref.reference_name
+                    doc.paid_amount = invoice.total - invoice.outstanding_amount
+                    doc.save()
+
+def payment_update(payment_entry, method):
+    if payment_entry.payment_type == "Receive":
+        for ref in payment_entry.references:
+            if(ref.reference_doctype == "Sales Invoice"):
+                invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
+                for item in invoice.items:
                     doc = frappe.get_doc("Plot", item.item_name)
                     doc.outstanding_balance = invoice.outstanding_amount
                     doc.customer = invoice.customer_name
@@ -198,7 +210,7 @@ def get_new_subdivisions(name = None):
         if count > 0:
             project.save()
             frappe.msgprint("Done!")
-            
+
 @frappe.whitelist()
 def plot_coordinates(name):
     coordinates = frappe.get_all('Coordinates', filters={'plots': name}, fields=['latitude', 'longitude'])
