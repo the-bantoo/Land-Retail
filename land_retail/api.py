@@ -229,13 +229,6 @@ def sub_coordinates(name):
     for plot in plots:
         plot_index = frappe.get_doc('Plot', plot.plot_id)
         subdivision_plot_info.append(plot_index)
-    #for plot in subdivision.plots:
-    #    coordinates = frappe.get_all('Coordinates', filters={'plots': plot}, fields=['latitude', 'longitude', 'plots'])
-    #    frappe.msgprint(coordinates)
-    #frappe.msgprint(subdivision.title)
-    #return subdivision.title
-    #return frappe.db.count('Subdivision')
-    #subdivisions = frappe.get_doc(doctype, name)
     
     return subdivision_plot_info
 
@@ -248,8 +241,6 @@ def return_subdivisions(project_name):
         subdiv =  frappe.get_doc('Subdivision', all_subdivision_details.title)
         project_subdivisions.append(subdiv);
     return project_subdivisions
-    #frappe.msgprint(all_subdivisions)
-    #return "Hey"
     
 @frappe.whitelist()
 def return_subdivision_plots(subdivision_name):
