@@ -77,6 +77,23 @@ def add_plot(payment_entry, method):
                     if item.plot_id:
                         ref.plot = item.item_code         
 
+def plot_project(payment_entry, method):
+    if payment_entry.payment_type == "Receive":
+        for ref in payment_entry.references:
+            if(ref.reference_doctype == "Sales Invoice"):
+                invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
+                for item in invoice.items:
+                    settings = frappe.get_doc('Land Settings')
+                    if item.item_name == settings.construction_item:
+                        continue
+                    plotproject = "Plot " + str(item.plot_id)
+                    project = frappe.get_list("Project", fields=['project_name'])
+                    if plotproject in project:
+                        frappe.errprint("Present!")
+                    else:
+                        frappe.errprint("Not present!")
+                        
+                        
 #Sales Invoice
 def plot_details(invoice, method):
     settings = frappe.get_doc("Land Settings")
@@ -96,25 +113,63 @@ def count_invoiced_plots(invoice, method):
                 frappe.throw("Only one plot is allowed per invoice")
             count += 1
 
+                        
+#Map Coordinates
+@frappe.whitelist()
+def sub_coordinates(name):
+    subdivision = frappe.get_doc('Subdivision', name)
+    plots = subdivision.plots
+    subdivision_plot_info = []
+    for plot in plots:
+        plot_index = frappe.get_doc('Plot', plot.plot_id)
+        subdivision_plot_info.append(plot_index)
+    
+    return subdivision_plot_info
 
-def plot_project(payment_entry, method):
-    if payment_entry.payment_type == "Receive":
-        for ref in payment_entry.references:
-            if(ref.reference_doctype == "Sales Invoice"):
-                invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
-                for item in invoice.items:
-                    settings = frappe.get_doc('Land Settings')
-                    if item.item_name == settings.construction_item:
-                        continue
-                    plotproject = "Plot " + str(item.plot_id)
-                    project = frappe.get_doc("Project",plotproject)
-                    if plotproject != project.project_name and invoice.outstanding_amount >= 0.5 * invoice.total:
-                        plot = frappe.get_doc("Plot", item.plot_id)
-                        plot_project = frappe.get_doc({
-                            "doctype": "Project",
-                            "project_name": "Plot " + str(plot.plot_id),
-                            "status": "Open",
+@frappe.whitelist()
+def return_subdivisions(project_name):
+    all_subdivisions = frappe.get_all('Subdivision', filters={'project': project_name}, fields=['title'])
+    
+    project_subdivisions = []
+    for all_subdivision_details in all_subdivisions:
+        subdiv =  frappe.get_doc('Subdivision', all_subdivision_details.title)
+        project_subdivisions.append(subdiv);
+    return project_subdivisions
+    
+@frappe.whitelist()
+def return_subdivision_plots(subdivision_name):
+    all_subdivision_plots = frappe.get_all('Plot', filters={'subdivision': subdivision_name}, fields=['plot_id'])
+    
+    subdivision_plots = []
+    for subdivision_plot in all_subdivision_plots:
+        subdiv_plot = frappe.get_doc('Plot', subdivision_plot.plot_id)
+        subdivision_plots.append(subdiv_plot)
+    return subdivision_plots
 
-                        })
-                        plot_project.flags.ignore_permission = True
-                        plot_project.insert()
+
+
+#Adding Plots to Subdivisions
+
+#Adding Subdivisions to Projects
+@frappe.whitelist()
+def get_new_subdivisions(name = None):"""
+    project = frappe.get_doc('Project', name)
+    project_subs = project.subdivision
+    num_project_subs = len(project_subs)
+    all_subs = frappe.get_all('Subdivision', filters={'project': name})
+    num_all_subs = len(all_subs)
+    count = 0
+    
+    if int(num_all_subs) > int(num_project_subs):
+        for subdivision in all_subs:
+            if not any(project_subs.subdivision == subdivision['name'] for project_subs in project_subs):
+                #project.append("subdivision", subdivision)
+                project.append('subdivision', {
+                    'title': all_subs.title,
+                    'project': name
+                })
+                count += 1
+
+                if count > 0:
+                    project.save()
+                    frappe.msgprint("Saved")"""
