@@ -1,10 +1,10 @@
 [
  {
   "docstatus": 0,
-  "doctype": "Custom Script",
+  "doctype": "Client Script",
   "dt": "Sales Invoice",
   "modified": "2020-10-29 16:43:58.986461",
-  "name": "Sales Invoice-Client",
+  "name": "Sales Invoice-Form",
   "parent": null,
   "parentfield": null,
   "parenttype": null,
@@ -12,10 +12,10 @@
  },
  {
   "docstatus": 0,
-  "doctype": "Custom Script",
+  "doctype": "Client Script",
   "dt": "Payment Entry",
   "modified": "2020-10-29 18:38:45.185239",
-  "name": "Payment Entry-Client",
+  "name": "Payment Entry-Form",
   "parent": null,
   "parentfield": null,
   "parenttype": null,

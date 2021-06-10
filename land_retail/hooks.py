@@ -159,11 +159,12 @@ doc_events = {
 
 fixtures = [
     {
-        "dt": "Custom Script",
+        "dt": "Client Script",
         "filters": [
             [
                 "name", "in", [
-                    "Sales Invoice-Client"
+                    "Sales Invoice-Form",
+                    "Payment Entry-Form"
                 ]
             ]
         ]
