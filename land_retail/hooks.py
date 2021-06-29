@@ -89,20 +89,21 @@ doc_events = {
         "after_insert": "land_retail.api.create_item",
         "validate": "land_retail.api.calculate_area",
     },
-    "Project": {
-        "after_save": "land_retail.api.create_project_item"
-    },
     "Sales Invoice": {
-        "validate": "land_retail.api.count_invoiced_plots",
+        "validate": "land_retail.api.plot_details",
+        "on_submit": "land_retail.api.count_invoiced_plots",
     },
     "Payment Entry": {
-        "on_submit": "land_retail.api.add_plots_to_payment_entry",
-        "after_save": "land_retail.api.send_email",
-        "on_submit": "land_retail.api.construction_Payment",
+        "validate": "land_retail.api.add_plot",
         "on_submit": "land_retail.api.payment_update",
         "on_cancel": "land_retail.api.cancel_payment",
+        "validate": "land_retail.api.plot_project",
+    },
+    "Project":{
+     "after_insert": "land_retail.api.project_item"
     },
 }
+
 
 # doc_events = {
 # 	"*": {
@@ -164,9 +165,12 @@ fixtures = [
             [
                 "name", "in", [
                     "Sales Invoice-Form",
-                    "Payment Entry-Form"
+                    "Payment Entry-Form",
+                    "Plot-Form",
+                    "Project-Form",
+                    "Subdivision-Form"
                 ]
-            ]
+            ],
         ]
 
     },
@@ -198,16 +202,27 @@ fixtures = [
         ]
     },
     {
+		"dt": "Workspace",
+		"filters": [
+			[
+				"name", "in", [
+					"Land Planning & Allocation"
+				]
+			]
+		]
+
+	},
+    {
         "dt": "Custom Field",
         "filters": [
             [
                 "name", "in", [
-                    "Sales Invoice Item-land_details",
+                    "Sales Invoice Item-plot_details",
                     "Sales Invoice-payment_notification"
                     "Sales Invoice Item-plot_id",
-                    "Sales Invoice Item-column_break_7",
-                    "Sales Invoice Item-land_project",
-                    "Sales Invoice Item-subdivision",
+                    "Sales Invoice Item-column_break_12",
+                    "Sales Invoice Item-plot_project",
+                    "Sales Invoice Item-plot_subdivision",
                     "Customer-nrc_number",
                     "Project-map_section",
                     "Project-map",

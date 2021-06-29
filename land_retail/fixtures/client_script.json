@@ -1,0 +1,67 @@
+[
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Plot",
+  "enabled": 1,
+  "modified": "2021-06-12 11:17:56.800062",
+  "name": "Plot-Form",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "script": "frappe.ui.form.on('Plot', {\n\trefresh(frm) {\n\t    \n\t    var landStatus = frm.doc.status;\n\t    //Area Color\n        var areaColor = '';\n                            \n        if(landStatus == \"Available\")\n        {\n            areaColor = 'green';\n        }\n                            \n        else if(landStatus == \"Reserved\"){\n            areaColor = 'orange';\n        }\n                            \n        else if(landStatus == \"Sold\"){\n            areaColor = 'red';\n        }\n                            \n        else if (landStatus == \"Partially Paid\"){\n            areaColor = 'blue';\n        }\n                            \n        else{\n            areaColor = 'grey';\n        }\n\t    \n\t    var plotlatlngs = [];\n\t    \n\t    //Reference for project map\n        var map = frm.get_field(\"map\").map;\n          \n        map.stopLocate();\n     \n\t\tconsole.log(frm.doc.coordinates);\n\t\t$.each(frm.doc.coordinates, function(plot_index, plot_coordinates){\n\t\t    plotlatlngs.push([plot_coordinates.longitude, plot_coordinates.latitude]);\n\t\t})\n\t\t\n\t\tvar plotpolyline = L.polyline(plotlatlngs, {color: 'indigo', opacity: 1, weight: 0, fill: 1, fillOpacity: 0.5, fillColor: areaColor}).addTo(map);\n\t\tplotpolyline.bindPopup(\"<b>Plot:</b> \" + frm.doc.plot_id).openPopup();\n\t\tmap.fitBounds(plotpolyline.getBounds());\n\t}\n});\n\n",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Subdivision",
+  "enabled": 1,
+  "modified": "2021-06-10 20:14:25.360303",
+  "name": "Subdivision-Form",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "script": "frappe.ui.form.on('Subdivision', {\n\trefresh(frm) {\n\t    \n\t    var allplotslatlngs = [];\n\t\tvar subdivlatlngs = [];\n\t    \n\t    //Reference for project map\n        var map = frm.get_field(\"map\").map;\n          \n        map.stopLocate();\n     \n\t\t//console.log(frm.doc.coordinates);\n\t\t$.each(frm.doc.coordinates, function(subdiv_index, subdiv_coordinates){\n\t\t    subdivlatlngs.push([subdiv_coordinates.longitude, subdiv_coordinates.latitude]);\n\t\t})\n\t\t\n\t\tfrappe.call({\n\t\t    \"method\": \"land_retail.api.return_subdivision_plots\",\n\t\t    args: {\n\t\t        doctype: \"Subdivision\",\n\t\t        subdivision_name: frm.doc.name\n\t\t    },\n\t\t    callback: function(r){\n\t\t        $.each(r.message, function(plot_index, plot){\n\t\t            \n\t\t            var landStatus = plot.status;\n\t\t            var areaColor = '';\n\t\t            \n\t\t            if(landStatus == \"Available\"){\n\t\t                areaColor = 'green';\n\t\t            }\n\t\t            \n\t\t            else if(landStatus == \"Reserved\"){\n                        areaColor = 'orange';\n                    }\n                                        \n                    else if(landStatus == \"Completed\"){\n                        areaColor = 'grey';\n                    }\n                                        \n                    else if (landStatus == \"Paid\"){\n                        areaColor = 'blue';\n                    }\n                                        \n                    else{\n                        areaColor = 'grey';\n                    }\n\t\t            \n\t\t            var plotlatlngs = [];\n\t\t            \n\t\t            $.each(plot.coordinates, function(i, plot_coordinates){\n\t\t                plotlatlngs.push([plot_coordinates.longitude, plot_coordinates.latitude]);\n\t\t            });\n\t\t            var plotpolyline = L.polyline(plotlatlngs, {color: 'indigo', opacity: 1, weight: 0, fill: 1, fillOpacity: 0.5, fillColor: areaColor}).addTo(map);\n\t\t            plotpolyline.bindPopup(\"<b>Plot:</b> \" + plot.plot_id).openPopup();\n\t\t        })\n\t\t    }\n\t\t})\n\t\t\n\t\tvar subdivpolyline = L.polyline(subdivlatlngs, {color: 'purple', opacity: 1, weight: 0, fill: 1, fillOpacity: 0.2, fillColor: 'purple'}).addTo(map);\n\t\t//subdivpolyline.bindPopup(\"<b>Plot:</b> \" + frm.doc.plot_id).openPopup();\n\t\tmap.fitBounds(subdivpolyline.getBounds());\n\t}\n})",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Project",
+  "enabled": 1,
+  "modified": "2021-06-10 21:42:20.692781",
+  "name": "Project-Form",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "script": "frappe.ui.form.on('Project', {\r\n  refresh(frm) {\r\n            \r\n      //Reference for project map\r\n      var map = frm.get_field(\"map\").map;\r\n      \r\n      map.stopLocate();\r\n      //Multi-dimension array to store project coordinates\r\n      var projectlatlngs = [];\r\n      \r\n      var allplotlatlngs = [];\r\n      \r\n      //Loop through Project's land coordinates and draw a plot of it\r\n      $.each(frm.doc.land_coordinates, function(land_project_coordinates_index, land_project_coordinates){\r\n          projectlatlngs.push([land_project_coordinates.longitude, land_project_coordinates.latitude]);\r\n      });\r\n      \r\n     var projectpolyline = L.polyline(projectlatlngs, {color: 'indigo', opacity: 1, weight: 0, fill: 1, fillOpacity: 0.2, fillColor: 'indigo'}).addTo(map);\r\n     map.fitBounds(projectpolyline.getBounds());\r\n        \r\n        frappe.call({\r\n            \"method\": \"land_retail.api.return_subdivisions\",\r\n            args: {\r\n                doctype: \"Project\",\r\n                project_name: frm.doc.name\r\n            },\r\n            callback: function (data) {\r\n                var all_subdivlatlngs = [];\r\n                var subdiv_name = \"\";\r\n                var subdivlatlngs = [];\r\n                $.each(data.message, function(i, subs){\r\n                    subdiv_name = subs.title;\r\n                    $.each(subs.coordinates, function(subdiv_index, subdiv_coordinates){\r\n                        subdivlatlngs.push([subdiv_coordinates.longitude, subdiv_coordinates.latitude]);\r\n                    });\r\n                });\r\n                \r\n                //Draw plots in subdivision(s)\r\n                frappe.call({\r\n                    \"method\": \"land_retail.api.return_subdivision_plots\",\r\n                    args: {\r\n                        doctype: \"Subdivision\",\r\n                        subdivision_name: subdiv_name\r\n                    },\r\n                    \r\n                    callback: function(r){\r\n                        $.each(r.message, function(subdiv_plot_index, subdiv_plot){\r\n                            var plotlatlngs = [];\r\n                            //Land Status\r\n                            var landStatus = subdiv_plot.status;\r\n                            \r\n                            //Area Color\r\n                            var areaColor = '';\r\n                            \r\n                            if(landStatus == \"Available\")\r\n                            {\r\n                                areaColor = 'green';\r\n                            }\r\n                            \r\n                            else if(landStatus == \"Reserved\"){\r\n                                areaColor = 'orange';\r\n                            }\r\n                            \r\n                            else if(landStatus == \"Completed\"){\r\n                                areaColor = 'grey';\r\n                            }\r\n                            \r\n                            else if (landStatus == \"Paid\"){\r\n                                areaColor = 'blue';\r\n                            }\r\n                            \r\n                            else{\r\n                                areaColor = 'grey';\r\n                            }\r\n                            console.log(subdiv_plot.plot_id);\r\n                            $.each(subdiv_plot.coordinates, function(plot_index, plot){\r\n                                plotlatlngs.push([plot.longitude, plot.latitude]);\r\n                            });\r\n                            \r\n                            var plotpolyline = L.polyline(plotlatlngs, {color: 'black', opacity: 1, weight: 0, fill: 1, fillOpacity: 1, fillColor: areaColor}).addTo(map);\r\n                                \r\n                            allplotlatlngs.push(plotpolyline);\r\n                        });\r\n                    }\r\n                });\r\n                \r\n                var subdivurl = 'https://december.thebantoo.com/desk#Form/Subdivision/'+subdiv_name;\r\n                var encodedsubdivurl = encodeURI(subdivurl);\r\n                var subdivisionPolyLine = L.polyline(subdivlatlngs, {color: 'purple', opacity: 1, weight: 0, fill: 1, fillOpacity: 0.3, fillColor: 'purple'}).addTo(map);\r\n                subdivisionPolyLine.bindPopup(\r\n                    \"<a href=\"+encodedsubdivurl+\">\" + subdiv_name + \"</a>\"\r\n                    ).openPopup();\r\n            }\r\n        });\r\n  }\r\n});",
+  "view": "Form"
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Sales Invoice",
+  "enabled": 0,
+  "modified": "2021-06-13 10:36:50.194460",
+  "name": "Sales Invoice-Form",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "script": "frappe.ui.form.on('Sales Invoice', {\n\trefresh(frm) {\n\t\t// your code here\n\t}\n});\n\nfrappe.ui.form.on('Sales Invoice Item', {\n\t// cdt is Child DocType name i.e Quotation Item\n    // cdn is the row name for e.g bbfcb8da6a\n    item_code(frm, cdt, cdn) {\n        let item_row = frappe.get_doc(cdt, cdn); //get the new item row\n        let item_code = item_row.item_code;\n        \n        if(item_code.toLowerCase().startsWith(\"plot \")){ //test if item is a plot\n            let plot_id = item_code.substr(5).toString(); //strip off \"Plot \" from Plot Item title\n\n            frm.set_value('update_stock', '1');\n            if (frm.set_warehouse === \"\" || !frm.set_warehouse) {\n                frappe.call({\n                    method: \"frappe.client.get\",\n                    args: {\n                        doctype: \"Land Settings\"\n                    },\n                    callback(r) {\n                        if(r.message) {          \n                            frm.set_value('set_warehouse', r.message.sales_land_warehouse);\n                        }\n                    }\n                });\n                \n            }\n\n            \n            //get Plot with matching plot name and assign its values to those of sales invoice item\n            frappe.call({\n    \t\t\t\"method\": \"frappe.client.get\",\n    \t\t\t\"args\": {\n    \t\t\t\t\"doctype\": \"Plot\",\n    \t\t\t\t\"name\": plot_id\n    \t\t\t},\n    \t\t\t\"callback\": function(data) {\n    \t\t\t\tlet plot = data.message;\n    \n    \t\t\t\tif (plot) {\n    \t\t\t\t\titem_row.plot_id = plot_id;\n                        item_row.land_project = plot.project;\n                        item_row.subdivision = plot.subdivision;\n    \t\t\t\t}\n    \t\t\t}\n    \t\t});\n        }\n    }\n});\n",
+  "view": null
+ },
+ {
+  "docstatus": 0,
+  "doctype": "Client Script",
+  "dt": "Payment Entry",
+  "enabled": 1,
+  "modified": "2021-06-12 19:10:39.295416",
+  "name": "Payment Entry-Form",
+  "parent": null,
+  "parentfield": null,
+  "parenttype": null,
+  "script": "frappe.ui.form.on('Payment Entry', {\n\trefresh(frm) {\n\t\t// your code here\n\t}\n});\n\nfunction do_the_deed(invoice){\n    \n    \n    /**\n    \n    let item_code = item_row.item_code;\n\n    if(item_code.toLowerCase().startsWith(\"plot \")){ //test if item is a plot\n        let plot_id = item_code.substr(5).toString(); \n    }*/\n}\n\nfrappe.ui.form.on('Payment Entry Reference', {\n\treference_name(frm, cdt, cdn) {\n\t\t\n        let row = frappe.get_doc(cdt, cdn); \n        \n\t\tif(row.reference_doctype == \"Sales Invoice\") {\n            \n            frappe.call({\n                method: \"frappe.client.get\",\n                args: {\n                    doctype: \"Sales Invoice\",\n                    name: row.reference_name,\n                    'fieldname': ['items']\n                },\n                callback(r) {\n                    if(r.message) {\n                        let i = \"\";\n                        let invoice = r.message;\n                        \n                        for(i in invoice.items) {\n                            if (invoice.items[i].plot_id) {\n                               row.plot = invoice.items[i].plot_id;\n                               \n                            }\n                        }\n                    }\n                }\n            });\n\t\t    \n\t\t}\n\t}\n});",
+  "view": null
+ }
+]

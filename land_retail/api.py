@@ -1,52 +1,8 @@
 import frappe
-import json
 from frappe import _
 
-@frappe.whitelist()
-def notification_email(payment_entry, method):
-    if payment_entry.payment_type == "Receive":
-        for ref in payment_entry.references:
-            if(ref.reference_doctype == "Sales Invoice"):
-                invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
-                if ((invoice.total - invoice.outstanding_amount) >= (invoice.total * 0.2)) & ((invoice.total - invoice.outstanding_amount) < (invoice.total * 0.5)):
-                    frappe.sendmail(
-                        recipients="duncan@thebantoo.com",
-                        sender="erp@thebantoo.com",
-                        subject="20" + "%" + " Plot Payment",
-                        message="Plot Payment Email Test"
-                    )
-                    invoice.payment_notification = 'Partly Paid'
-                    invoice.save()
-                    frappe.msgprint(_("Hello World!"))
-                elif ((invoice.total - invoice.outstanding_amount) >= (invoice.total * 0.5)) & ((invoice.total - invoice.outstanding_amount) < invoice.total):
-                    frappe.sendmail(
-                        recipients="duncan@thebantoo.com",
-                        sender="erp@thebantoo.com",
-                        subject="50" + "%" + " Plot Payment",
-                        message="Plot Payment Email Test"
-                    )
-                    invoice.payment_notification = 'Paid In Half'
-                    frappe.msgprint(_("Hello Space!"))
-                elif (invoice.outstanding_amount == 0):
-                    frappe.sendmail(
-                        recipients="duncan@thebantoo.com",
-                        sender="erp@thebantoo.com",
-                        subject="100" + "%" + " Plot Payment",
-                        message="Plot Payment Email Test"
-                    )
-                    invoice.payment_notification = 'Paid In Full'
-                    frappe.msgprint(_("Hello Universe!"))
-
-def add_plots_to_payment_entry(payment_entry, method):
-    if payment_entry.payment_type == "Receive":
-        for ref in payment_entry.references:
-            if(ref.reference_doctype == "Sales Invoice"):
-                invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
-                for item in invoice.items:
-                    if item.item_code:
-                        ref.plot = item.item_code
-
-def plot_item(plot, method):
+#Plot
+def create_item(plot, method):
     settings = frappe.get_doc('Land Settings')
     plot_item = frappe.get_doc({
         "doctype": "Item",
@@ -56,7 +12,6 @@ def plot_item(plot, method):
         "land": 1,
         "is_stock_item": 1,
         "stock_uom": "Square Meter",
-        "opening_stock": plot.area,
         "standard_rate": plot.plot_price / plot.area,
         "is_purchase_item": 0,
         "is_sales_item": 1,
@@ -64,41 +19,21 @@ def plot_item(plot, method):
         "description": "Project: " + str(plot.project) + "<br>" + "Subdivision: " + str(plot.subdivision) + "<br>" + "Plot ID: " + str(plot.plot_id) + "<br>" + "Dimensions: " + str(plot.dimensions) + "<br>" + "Area: " + str(plot.area) + "sqm",
     })
     plot_item.flags.ignore_permission = True
-    plot.plot_no = plot.plot_id
-    plot.reservation_fee = settings.reservation_fee
     plot_item.insert()
+    plot.reservation_fee = settings.reservation_fee
+    plot.outstanding_balance = plot.plot_price
+    plot.status = settings.default_status
+    plot.plot_no = plot.plot_id
     plot.save()
 
 def calculate_area(plot, method):
     if not plot.area or int(plot.area) <= 0:
-        plot.area = int(input(plot.width * plot.length))
+        plot.area = int(plot.width) * int(plot.length)
 
     plot.dimensions = str(plot.width) + " x " + str(plot.length) + "m"
 
-def project_item(project, method):
-    settings = frappe.get_doc('Land Settings')
-    project_item = frappe.get_doc({
-        "doctype": "Item",
-        "item_name": project.project_name,
-        "item_group": settings.land_in_bulk_group,
-        "land": 1,
-        "item_code": project.project_name,
-        "is_stock_item": 1,
-        "stock_uom": "Square Meter",
-        "include_item_in_manufacturing": 0,
-    })
-    project_item.flags.ignore_permission = True
-    project_item.insert()
-
-def count_invoiced_plots(invoice, method):
-    count = 1
-    for item in invoice.items:
-        if item.plot_id:
-            if count > 1:
-                frappe.throw("Only one plot is allowed per invoice")
-            count += 1
-
-def construction_Payment(payment_entry, method):
+#Payment Entry
+def payment_update(payment_entry, method):
     if payment_entry.payment_type == "Receive":
         for ref in payment_entry.references:
             if(ref.reference_doctype == "Sales Invoice"):
@@ -107,120 +42,93 @@ def construction_Payment(payment_entry, method):
                     settings = frappe.get_doc('Land Settings')
                     if item.item_name == settings.construction_item:
                         continue
-                    doc = frappe.get_doc("Plot", item.item_name)
-                    doc.outstanding_balance = invoice.outstanding_amount
-                    doc.customer = invoice.customer_name
-                    doc.sales_invoice = ref.reference_name
-                    doc.paid_amount = invoice.total - invoice.outstanding_amount
-                    doc.save()
+                    plot = frappe.get_doc("Plot", item.item_name)
+                    plot.outstanding_balance = invoice.outstanding_amount
+                    plot.customer_name = invoice.customer_name
+                    plot.sales_invoice = ref.reference_name
+                    plot.paid_amount = payment_entry.total_allocated_amount
+                    plot.save()
+                    if plot.paid_amount > plot.reservation_fee and plot.paid_amount < plot.plot_price:
+                        plot.status = "Partially Paid"
+                        plot.save()
+                    elif plot.paid_amount > 0 and plot.paid_amount <= plot.reservation_fee:
+                        plot.status = "Reserved"
+                        plot.save()
+                    elif plot.paid_amount >= plot.plot_price and plot.outstanding_balance == 0:
+                        plot.status = "Sold"
+                        plot.save()
+                    
 
-def payment_update(payment_entry, method):
+def cancel_payment(payment_entry, method):
+    settings = frappe.get_doc("Land Settings")
+    if payment_entry.payment_type == "Receive":
+        for ref in payment_entry.references:
+            if(ref.reference_doctype == "Sales Invoice"):
+                sales_invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
+                for item in sales_invoice.items:
+                    if item.item_name == settings.construction_item:
+                        continue
+                    plot = frappe.get_doc('Plot', item.item_name)
+                    plot.outstanding_balance = int(plot.outstanding_balance) + payment_entry.total_allocated_amount
+                    plot.customer_name = sales_invoice.customer_name
+                    plot.sales_invoice = ref.reference_name
+                    plot.paid_amount = int(plot.paid_amount) - payment_entry.total_allocated_amount
+                    plot.save()
+                    if plot.paid_amount == 0:
+                        plot.customer_name = ""
+                        plot.sales_invoice = ""
+                        plot.outstanding_balance = 0
+                        plot.status = "Available"
+                        plot.save()
+                        
+                        
+def add_plot(payment_entry, method):
     if payment_entry.payment_type == "Receive":
         for ref in payment_entry.references:
             if(ref.reference_doctype == "Sales Invoice"):
                 invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
                 for item in invoice.items:
-                    doc = frappe.get_doc("Plot", item.item_name)
-                    doc.outstanding_balance = invoice.outstanding_amount
-                    doc.customer = invoice.customer_name
-                    doc.sales_invoice = ref.reference_name
-                    doc.paid_amount = invoice.total - invoice.outstanding_amount
-                    doc.save()
+                    if item.plot_id:
+                        ref.plot = item.item_code         
 
-def cancel_payment(payment_entry, method):
-    settings = frappe.get_doc('Land Settings')
+def plot_project(payment_entry, method):
     if payment_entry.payment_type == "Receive":
         for ref in payment_entry.references:
             if(ref.reference_doctype == "Sales Invoice"):
-                sales_invoice = frappe.get_doc(
-                    "Sales Invoice", ref.reference_name)
-                for item in sales_invoice.items:
+                invoice = frappe.get_doc("Sales Invoice", ref.reference_name)
+                for item in invoice.items:
+                    settings = frappe.get_doc('Land Settings')
                     if item.item_name == settings.construction_item:
                         continue
-                    doc = frappe.get_doc("Plot", item.item_name)
-                    doc.outstanding_balance = str(doc.balance) + \
-                        str(payment_entry.total_allocated_amount)
-                    doc.customer = sales_invoice.customer_name
-                    doc.sales_invoice = ref.reference_name
-                    doc.paid_amount = doc.paid_amount - \
-                        payment_entry.total_allocated_amount
-                    doc.save()
-                    if doc.paid_amount == 0:
-                        doc.customer = ""
-                        doc.sales_invoice = ""
-                        doc.outstanding_balance = 0
-                        doc.save()
+                    plotproject = "Plot " + str(item.plot_id)
+                    project = frappe.get_list("Project", fields=['project_name'])
+                    if plotproject in project:
+                        frappe.errprint("Present!")
+                    else:
+                        frappe.errprint("Not present!")
+                        
 
-def plot_project(sales_invoice, method):
+#Sales Invoice
+def plot_details(invoice, method):
+    settings = frappe.get_doc("Land Settings")
+    for item in invoice.items:
+        if item.item_code == settings.construction_item:
+            continue
+        plot = frappe.get_doc("Plot", item.item_code)
+        item.plot_id = plot.plot_id
+        item.plot_project = plot.project
+        item.plot_subdivision = plot.subdivision
+      
+def count_invoiced_plots(invoice, method):
     count = 1
-    for item in sales_invoice.items:
-        if count > 1:
-            for item in sales_invoice.items:
-                settings = frappe.get_doc('Land Settings')
-                if item.item_name == settings.construction_item:
-                    continue
-                if sales_invoice.outstanding_amount <= (0.5 * sales_invoice.total):
-                    doc = frappe.get_doc('Plot', item.item_name)
-                    project = frappe.get_doc({
-                        "doctype": "Project",
-                        "project_name": "Construction on " + str(doc.plot_id),
-                        "status": "Open",
-                    })
-                    project.flags.ignore_permission = True
-                    project.save()
-                    doc.plot_project = "Construction on " + str(doc.plot_id)
-                    doc.save()
-        count += 1
-        
-@frappe.whitelist()
-def get_new_plots(name = None):
-    sub = frappe.get_doc('Subdivision', name)
-    sub_plots = sub.plots
-    num_sub_plots = len(sub_plots)
-    all_plots = frappe.get_all('Plot', filters={'subdivision': name}, fields=['name', 'customer_name', 'status'])#Get all plots
-    num_all_plots = len(all_plots)
-    count = 0
-    
-    if int(num_all_plots) > int(num_sub_plots):
-        for plot in all_plots:
-            if not any(sub_plot.plot_id == plot['name'] for sub_plot in sub_plots):
-                sub.append("plots", plot)
-                count += 1
-                
-        if count > 0:
-            sub.save()
+    for item in invoice.items:
+        if item.plot_id:
+            if count > 1:
+                frappe.throw("Only one plot is allowed per invoice")
+            count += 1
 
-@frappe.whitelist()
-def get_new_subdivisions(name = None):
-    project = frappe.get_doc('Project', name)
-    project_subs = project.subdivision
-    num_project_subs = len(project_subs)
-    all_subs = frappe.get_all('Subdivision', filters={'project': name}, fields=['name'])#Get all subdivisions
-    frappe.msgprint(str(all_subs))
-    num_all_subs = len(all_subs)
-    count = 0
-
-    if int(num_all_subs) > int(num_project_subs):
-        for subdivision in all_subs:
-            if not any(project_subs.subdivision == subdivision['name'] for project_subs in project_subs):
-                project.append("subdivision", subdivision)
-                frappe.msgprint(str(project))
-                count += 1
-        
-        if count > 0:
-            project.save()
-            frappe.msgprint("Done!")
-
-@frappe.whitelist()
-def plot_coordinates(name):
-    coordinates = frappe.get_all('Coordinates', filters={'plots': name}, fields=['latitude', 'longitude'])
-    
-    plot = frappe.get_all('Plot', filters={'plot_id': name}, fields=['plot_id', 'plot_no', 'subdivision', 'project', 'area', 'length', 'width', 
-    'status', 'plot_price', 'map', 'customer_name', 'plot_project', 'value', 'balance', 'reservation_fee', 'dimensions'])
-    plot_info = plot + coordinates
-    
-    return plot_info
-
+                        
+#Map Coordinates
 @frappe.whitelist()
 def sub_coordinates(name):
     subdivision = frappe.get_doc('Subdivision', name)
@@ -251,3 +159,24 @@ def return_subdivision_plots(subdivision_name):
         subdiv_plot = frappe.get_doc('Plot', subdivision_plot.plot_id)
         subdivision_plots.append(subdiv_plot)
     return subdivision_plots
+
+#Project
+def project_item(project, method):
+    settings = frappe.get_doc('Land Settings')
+    if project.project_type == "Land":
+        item = frappe.get_doc({
+            "doctype": "Item",
+            "item_group": settings.land_in_bulk_group,
+            "default_warehouse": settings.bulk_land_warehouse,
+            "item_code": project.project_name,
+            "land": 1,
+            "is_stock_item": 1,
+            "stock_uom": "Square Meter",
+            "is_purchase_item": 1,
+            "is_sales_item": 1,
+            "include_item_in_manufacturing": 0,
+            "description": "Project Name: " + str(project.project_name) + "<br>" + "Project Area: " + str(project.area_sqm) + "sqm",
+            
+        })
+        item.flags.ignore_permission = True
+        item.insert()

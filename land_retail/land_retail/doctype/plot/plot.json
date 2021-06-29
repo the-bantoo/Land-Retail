@@ -15,7 +15,7 @@
   "status",
   "plot_item",
   "section_break_7",
-  "land_details",
+  "plot_details",
   "area",
   "dimensions",
   "plot_price",
@@ -26,8 +26,8 @@
   "map",
   "coordinates_section",
   "coordinates",
-  "customer_information",
-  "customer",
+  "payment_information",
+  "customer_name",
   "sales_invoice",
   "column_break_13",
   "paid_amount",
@@ -61,8 +61,7 @@
    "fieldname": "project",
    "fieldtype": "Link",
    "label": "Project",
-   "options": "Project",
-   "reqd": 1
+   "options": "Project"
   },
   {
    "fieldname": "column_break_3",
@@ -85,12 +84,6 @@
    "collapsible": 1,
    "fieldname": "section_break_7",
    "fieldtype": "Section Break"
-  },
-  {
-   "collapsible": 1,
-   "fieldname": "land_details",
-   "fieldtype": "Section Break",
-   "label": "Land Details"
   },
   {
    "fieldname": "area",
@@ -148,12 +141,6 @@
    "options": "Coordinates"
   },
   {
-   "collapsible": 1,
-   "fieldname": "customer_information",
-   "fieldtype": "Section Break",
-   "label": "Customer Information"
-  },
-  {
    "fieldname": "column_break_13",
    "fieldtype": "Column Break"
   },
@@ -161,12 +148,6 @@
    "fieldname": "outstanding_balance",
    "fieldtype": "Currency",
    "label": "Outstanding Balance",
-   "read_only": 1
-  },
-  {
-   "fieldname": "customer",
-   "fieldtype": "Data",
-   "label": "Customer Name",
    "read_only": 1
   },
   {
@@ -183,16 +164,37 @@
   {
    "fieldname": "reservation_fee",
    "fieldtype": "Currency",
+   "hidden": 1,
    "label": "Reservation Fee"
   },
   {
    "fieldname": "status",
+   "fieldtype": "Select",
+   "label": "Status",
+   "options": "Available\nReserved\nPartially Paid\nSold",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "payment_information",
+   "fieldtype": "Section Break",
+   "label": "Payment Information"
+  },
+  {
+   "fieldname": "customer_name",
    "fieldtype": "Data",
-   "label": "Status"
+   "label": "Customer Name",
+   "read_only": 1
+  },
+  {
+   "collapsible": 1,
+   "fieldname": "plot_details",
+   "fieldtype": "Section Break",
+   "label": "Plot Details"
   }
  ],
  "links": [],
- "modified": "2021-03-01 10:33:22.829085",
+ "modified": "2021-06-12 10:57:17.363511",
  "modified_by": "Administrator",
  "module": "Land Retail",
  "name": "Plot",

@@ -26,13 +26,15 @@
     "bcc": null,
     "cc": null,
     "condition": null,
-    "email_by_document_field": "contact_email",
-    "email_by_role": "Sales Manager",
     "parent": "20% of Land Cost Paid",
     "parentfield": "recipients",
-    "parenttype": "Notification"
+    "parenttype": "Notification",
+    "receiver_by_document_field": null,
+    "receiver_by_role": null
    }
   ],
+  "send_system_notification": 0,
+  "send_to_all_assignees": 0,
   "sender": null,
   "sender_email": null,
   "set_property_after_alert": null,
@@ -67,13 +69,15 @@
     "bcc": null,
     "cc": null,
     "condition": null,
-    "email_by_document_field": "contact_email",
-    "email_by_role": "Projects Manager",
     "parent": "50% of Land Cost Paid",
     "parentfield": "recipients",
-    "parenttype": "Notification"
+    "parenttype": "Notification",
+    "receiver_by_document_field": null,
+    "receiver_by_role": null
    }
   ],
+  "send_system_notification": 0,
+  "send_to_all_assignees": 0,
   "sender": "National Housing Empowerment Fund",
   "sender_email": "erp@thebantoo.com",
   "set_property_after_alert": null,
@@ -108,13 +112,15 @@
     "bcc": null,
     "cc": null,
     "condition": null,
-    "email_by_document_field": null,
-    "email_by_role": "Accounts Manager",
     "parent": "Ready For Sale",
     "parentfield": "recipients",
-    "parenttype": "Notification"
+    "parenttype": "Notification",
+    "receiver_by_document_field": null,
+    "receiver_by_role": null
    }
   ],
+  "send_system_notification": 0,
+  "send_to_all_assignees": 0,
   "sender": "Bantoo Dev",
   "sender_email": "erp@thebantoo.com",
   "set_property_after_alert": null,
