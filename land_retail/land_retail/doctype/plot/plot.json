@@ -13,6 +13,7 @@
   "column_break_3",
   "plot_type",
   "status",
+  "customer_id",
   "plot_item",
   "section_break_7",
   "plot_details",
@@ -168,6 +169,7 @@
    "label": "Reservation Fee"
   },
   {
+   "default": "Available",
    "fieldname": "status",
    "fieldtype": "Select",
    "label": "Status",
@@ -191,10 +193,16 @@
    "fieldname": "plot_details",
    "fieldtype": "Section Break",
    "label": "Plot Details"
+  },
+  {
+   "fieldname": "customer_id",
+   "fieldtype": "Link",
+   "label": "Potential Customer",
+   "options": "Customer"
   }
  ],
  "links": [],
- "modified": "2021-06-12 10:57:17.363511",
+ "modified": "2021-08-22 21:00:54.159816",
  "modified_by": "Administrator",
  "module": "Land Retail",
  "name": "Plot",

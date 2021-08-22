@@ -180,3 +180,31 @@ def project_item(project, method):
         })
         item.flags.ignore_permission = True
         item.insert()
+
+
+@frappe.whitelist()
+def new_invoice(name):
+    plot = frappe.get_doc('Plot', name)
+    
+    sales_invoice = frappe.get_doc({
+        "doctype": "Sales Invoice",
+        "customer": plot.customer_id,
+        "plot_id": name,
+        "items": [
+            {
+                "item_code": name,
+                "qty": plot.area,
+                "rate": int(plot.plot_price)/int(plot.area),
+                "project": plot.project,
+            }
+        ]
+    })
+    sales_invoice.insert()
+    frappe.msgprint(_("Sales Invoice Created"))
+    
+def insert_plot(plot, method):
+    subdivision = frappe.get_doc('Subdivision', plot.subdivision)
+    row = subdivision.append("plots", {
+        "plot_id": plot.plot_id,
+    })
+    row.insert()

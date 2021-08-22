@@ -5,11 +5,11 @@ from frappe import _
 
 app_name = "land_retail"
 app_title = "Land Retail"
-app_publisher = "Bantoo Accounting"
+app_publisher = "Bantoo Accounting Innovations"
 app_description = "Land Planning And Allocation"
 app_icon = "octicon octicon-file-directory"
 app_color = "grey"
-app_email = "hello@thebantoo.com"
+app_email = "technical@thebantoo.com"
 app_license = "MIT"
 
 # Includes in <head>
@@ -87,6 +87,7 @@ app_license = "MIT"
 doc_events = {
     "Plot": {
         "after_insert": "land_retail.api.create_item",
+        "after_insert": "land_retail.api.insert_plot",
         "validate": "land_retail.api.calculate_area",
     },
     "Sales Invoice": {
@@ -233,7 +234,14 @@ fixtures = [
                     "Project-ready_for_sale",
                     "Project-project_subdivision",
                     "Project-subdivision",
-                    "Item-land"
+                    "Item-land",
+                    "Sales Invoice-land_project",
+                    "Sales Invoice-area",
+                    "Sales Invoice-i",
+                    "Sales Invoice-dimensions",
+                    "Sales Invoice-plot_price",
+                    "Sales Invoice-plot_id",
+                    "Sales Invoice-plot_details",
 
                 ]
             ]
